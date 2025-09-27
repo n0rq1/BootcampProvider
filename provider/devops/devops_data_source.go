@@ -77,6 +77,7 @@ func (d *devopsDataSource) Configure(_ context.Context, req datasource.Configure
 func (d *devopsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
     var state DevopsDataSourceModel
 
+    state.Devops = make([]devopsModel, 0)
     items, err := d.client.GetDevOps()
     if err != nil {
         resp.Diagnostics.AddError(
@@ -87,7 +88,7 @@ func (d *devopsDataSource) Read(ctx context.Context, req datasource.ReadRequest,
     }
 
     for _, it := range items {
-        row := devopsDSModel{
+        row := devopsModel{
             ID: types.StringValue(it.ID),
         }
 
@@ -123,17 +124,12 @@ func (d *devopsDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 // DataSourceModel maps the data source schema data.
 type DevopsDataSourceModel struct {
-	Devops []devopsDSModel `tfsdk:"devops"`
+	Devops []devopsModel `tfsdk:"devops"`
 }
 
 // devModel maps Dev schema data.
-type devopsDSModel struct {
+type devopsModel struct {
 	ID   types.String `tfsdk:"id"`
 	Devs types.List   `tfsdk:"devs"`
 	Ops  types.List   `tfsdk:"ops"`
-}
-
-// DevInfoModel maps Dev info data
-type DevopsInfoModel struct {
-	ID types.String `tfsdk:"id"`
 }

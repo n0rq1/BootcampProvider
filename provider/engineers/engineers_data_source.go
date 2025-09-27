@@ -70,6 +70,8 @@ func (d *engineerDataSource) Configure(_ context.Context, req datasource.Configu
 // Read refreshes the Terraform state with the latest data.
 func (d *engineerDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var state EngineerDataSourceModel
+	// Ensure engineers is an empty list rather than null when there are no results
+	state.Engineers = make([]engineerModel, 0)
 
 	engineers, err := d.client.GetEngineers()
 	if err != nil {
@@ -82,7 +84,7 @@ func (d *engineerDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	// Map response body to model
 	for _, engineer := range engineers {
-		engineerState := engineersModel{
+		engineerState := engineerModel{
 			ID:    types.StringValue(engineer.ID),
 			Name:  types.StringValue(engineer.Name),
 			Email: types.StringValue(engineer.Email),
@@ -92,6 +94,7 @@ func (d *engineerDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 
 	// Set state
+	// This writes to the Terraform state
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -99,24 +102,15 @@ func (d *engineerDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 }
 
-// EngineerDataSourceModel maps the data source schema data.
+// EngineerDataSourceModel maps the data source schema data
+// Direction: Data Source -> Terraform State (output only)
 type EngineerDataSourceModel struct {
-	Engineers []engineersModel `tfsdk:"engineers"`
+	Engineers []engineerModel `tfsdk:"engineers"`
 }
 
-// engineersModel maps engineers schema data.
-type engineersModel struct {
-	ID    types.String `tfsdk:"id"`
-	Name  types.String `tfsdk:"name"`
-	Email types.String `tfsdk:"email"`
-}
-
-// EngineersInfoModel maps engineers info data
-type EngineersInfoModel struct {
-	ID types.String `tfsdk:"id"`
-}
-
-type engineerResourceModel struct {
+// engineerModel maps engineers schema data.
+// Direction: Data Source -> Terraform State (output only)
+type engineerModel struct {
 	ID    types.String `tfsdk:"id"`
 	Name  types.String `tfsdk:"name"`
 	Email types.String `tfsdk:"email"`

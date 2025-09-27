@@ -35,7 +35,7 @@ func (d *devDataSource) Metadata(_ context.Context, req datasource.MetadataReque
 func (d *devDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"dev": schema.ListNestedAttribute{
+			"devs": schema.ListNestedAttribute{
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -74,6 +74,8 @@ func (d *devDataSource) Configure(_ context.Context, req datasource.ConfigureReq
 func (d *devDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var state DevDataSourceModel
 
+	state.Devs = make([]devModel, 0)
+
 	devs, err := d.client.GetDev()
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -84,7 +86,7 @@ func (d *devDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 
 	for _, dv := range devs {
-		dvm := devDSModel{
+		dvm := devModel{
 			ID:   types.StringValue(dv.ID),
 			Name: types.StringValue(dv.Name),
 		}
@@ -101,7 +103,7 @@ func (d *devDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		}
 		dvm.Engineers = engList
 
-		state.Dev = append(state.Dev, dvm)
+		state.Devs = append(state.Devs, dvm)
 	}
 
 	diags := resp.State.Set(ctx, &state)
@@ -113,17 +115,12 @@ func (d *devDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 
 // DataSourceModel maps the data source schema data.
 type DevDataSourceModel struct {
-	Dev []devDSModel `tfsdk:"dev"`
+	Devs []devModel `tfsdk:"devs"`
 }
 
 // devModel maps Dev schema data.
-type devDSModel struct {
+type devModel struct {
 	ID        types.String `tfsdk:"id"`
 	Name      types.String `tfsdk:"name"`
 	Engineers types.List   `tfsdk:"engineers"`
-}
-
-// DevInfoModel maps Dev info data
-type DevInfoModel struct {
-	ID types.String `tfsdk:"id"`
 }

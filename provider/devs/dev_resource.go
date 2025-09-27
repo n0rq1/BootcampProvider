@@ -53,7 +53,7 @@ func (r *devResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 // Create creates the resource and sets the initial Terraform state.
 // Create a new resource.
 func (r *devResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan devResourceModel
+	var plan devModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() { return }
@@ -94,7 +94,7 @@ func (r *devResource) Create(ctx context.Context, req resource.CreateRequest, re
 // Read refreshes the Terraform state with the latest data.
 // Read resource information.
 func (r *devResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-    var state devResourceModel
+    var state devModel
 
     // Load current state to get the ID of this resource instance
     diags := req.State.Get(ctx, &state)
@@ -152,7 +152,7 @@ func (r *devResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *devResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-    var plan devResourceModel
+    var plan devModel
     diags := req.Plan.Get(ctx, &plan)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
@@ -160,7 +160,7 @@ func (r *devResource) Update(ctx context.Context, req resource.UpdateRequest, re
     }
 
     // Load current state to get the persisted ID (plan.ID may be unknown during update)
-    var state devResourceModel
+    var state devModel
     diags = req.State.Get(ctx, &state)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
@@ -228,7 +228,7 @@ func (r *devResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *devResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-    var state devResourceModel
+    var state devModel
     diags := req.State.Get(ctx, &state)
 
     resp.Diagnostics.Append(diags...)
@@ -271,11 +271,4 @@ func (r *devResource) Configure(_ context.Context, req resource.ConfigureRequest
 	}
 
 	r.client = client
-}
-
-// devResourceModel maps the resource schema data.
-type devResourceModel struct {
-	ID          types.String    `tfsdk:"id"`
-	Name        types.String    `tfsdk:"name"`
-	Engineers   types.List      `tfsdk:"engineers"`
 }

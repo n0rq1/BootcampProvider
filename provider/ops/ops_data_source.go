@@ -74,6 +74,7 @@ func (d *opsDataSource) Configure(_ context.Context, req datasource.ConfigureReq
 func (d *opsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var state opsDataSourceModel
 
+	state.Ops = make([]opsModel, 0)
 	devs, err := d.client.GetOps()
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -84,13 +85,17 @@ func (d *opsDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 
 	for _, dv := range devs {
-		dvm := opsDSModel{
+		dvm := opsModel{
 			ID:   types.StringValue(dv.ID),
 			Name: types.StringValue(dv.Name),
 		}
 
-		// dv.Engineers is []string of engineer IDs; map to Terraform list(string)
-		engList, diags := types.ListValueFrom(ctx, types.StringType, dv.Engineers)
+		// Map engineers (objects) to a list of engineer ID strings
+		engineerIDs := make([]string, 0, len(dv.Engineers))
+		for _, eng := range dv.Engineers {
+			engineerIDs = append(engineerIDs, eng.ID)
+		}
+		engList, diags := types.ListValueFrom(ctx, types.StringType, engineerIDs)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return
@@ -109,17 +114,12 @@ func (d *opsDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 
 // DataSourceModel maps the data source schema data.
 type opsDataSourceModel struct {
-	Ops []opsDSModel `tfsdk:"ops"`
+	Ops []opsModel `tfsdk:"ops"`
 }
 
 // opsModel maps Ops schema data.
-type opsDSModel struct {
+type opsModel struct {
 	ID        types.String `tfsdk:"id"`
 	Name      types.String `tfsdk:"name"`
 	Engineers types.List   `tfsdk:"engineers"`
-}
-
-// opsInfoModel maps Ops info data
-type opsInfoModel struct {
-	ID types.String `tfsdk:"id"`
 }

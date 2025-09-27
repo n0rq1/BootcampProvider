@@ -53,7 +53,7 @@ func (r *opsResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 // Create creates the resource and sets the initial Terraform state.
 // Create a new resource.
 func (r *opsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan opsResourceModel
+	var plan opsModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() { return }
@@ -94,7 +94,7 @@ func (r *opsResource) Create(ctx context.Context, req resource.CreateRequest, re
 // Read refreshes the Terraform state with the latest data.
 // Read resource information.
 func (r *opsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-    var state opsResourceModel
+    var state opsModel
 
     // Load current state to get the ID of this resource instance
     diags := req.State.Get(ctx, &state)
@@ -151,7 +151,7 @@ func (r *opsResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *opsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-    var plan opsResourceModel
+    var plan opsModel
     diags := req.Plan.Get(ctx, &plan)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
@@ -159,7 +159,7 @@ func (r *opsResource) Update(ctx context.Context, req resource.UpdateRequest, re
     }
 
     // Load current state to get the persisted ID (plan.ID may be unknown during update)
-    var state opsResourceModel
+    var state opsModel
     diags = req.State.Get(ctx, &state)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() {
@@ -226,7 +226,7 @@ func (r *opsResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *opsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-    var state opsResourceModel
+    var state opsModel
     diags := req.State.Get(ctx, &state)
 
     resp.Diagnostics.Append(diags...)
@@ -269,11 +269,4 @@ func (r *opsResource) Configure(_ context.Context, req resource.ConfigureRequest
 	}
 
 	r.client = client
-}
-
-// opsResourceModel maps the resource schema data.
-type opsResourceModel struct {
-	ID          types.String    `tfsdk:"id"`
-	Name        types.String    `tfsdk:"name"`
-	Engineers   types.List      `tfsdk:"engineers"`
 }

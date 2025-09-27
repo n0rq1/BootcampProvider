@@ -51,7 +51,7 @@ func (r *EngineerResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 
 // Create creates the resource and sets the initial Terraform state.
 func (r *EngineerResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan engineerResourceModel
+	var plan engineerModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 
@@ -89,7 +89,7 @@ func (r *EngineerResource) Create(ctx context.Context, req resource.CreateReques
 
 // Read refreshes the Terraform state with the latest data.
 func (r *EngineerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state engineerResourceModel
+	var state engineerModel
 
 	diags := req.State.Get(ctx, &state)
 
@@ -129,7 +129,7 @@ func (r *EngineerResource) Read(ctx context.Context, req resource.ReadRequest, r
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *EngineerResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan
-	var plan engineerResourceModel
+	var plan engineerModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -179,7 +179,7 @@ func (r *EngineerResource) Update(ctx context.Context, req resource.UpdateReques
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *EngineerResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Retrieve values from state
-	var state engineerResourceModel
+	var state engineerModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

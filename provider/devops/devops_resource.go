@@ -54,7 +54,7 @@ func (r *devopsResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 // Create creates the resource and sets the initial Terraform state.
 // Create a new resource.
 func (r *devopsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan devopsResourceModel
+	var plan devopsModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() { return }
@@ -97,7 +97,7 @@ func (r *devopsResource) Create(ctx context.Context, req resource.CreateRequest,
 // Read refreshes the Terraform state with the latest data.
 // Read resource information.
 func (r *devopsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state devopsResourceModel
+	var state devopsModel
 
     // Load current state to get the ID of this resource instance
     diags := req.State.Get(ctx, &state)
@@ -154,13 +154,13 @@ func (r *devopsResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *devopsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-    var plan devopsResourceModel
+    var plan devopsModel
     diags := req.Plan.Get(ctx, &plan)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() { return }
 
     // Load current state to get the persisted ID (plan.ID may be unknown during update)
-    var state devopsResourceModel
+    var state devopsModel
     diags = req.State.Get(ctx, &state)
     resp.Diagnostics.Append(diags...)
     if resp.Diagnostics.HasError() { return }
@@ -225,7 +225,7 @@ func (r *devopsResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *devopsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-    var state devopsResourceModel
+    var state devopsModel
     diags := req.State.Get(ctx, &state)
 
     resp.Diagnostics.Append(diags...)
@@ -268,11 +268,4 @@ func (r *devopsResource) Configure(_ context.Context, req resource.ConfigureRequ
 	}
 
 	r.client = client
-}
-
-// devopsResourceModel maps the resource schema data.
-type devopsResourceModel struct {
-	ID          types.String    `tfsdk:"id"`
-	Devs        types.List      `tfsdk:"devs"`
-	Ops         types.List      `tfsdk:"ops"`
 }
